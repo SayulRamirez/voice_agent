@@ -3,7 +3,7 @@ import keyboard
 from audio.audio import Audio
 from dotenv import load_dotenv
 from agent_ai.speech_to_text import SpeechToText
-
+from agent_ai.text_to_speech import TextToSpeech
 
 def main(): 
 
@@ -18,15 +18,22 @@ def main():
 
     response_text = stt.transcribe(content)
 
-    print("response", response_text)
+    text = ''
+    
     for result in response_text.results:
-        print(f"Transcript: {result.alternatives[0].transcript}")
+        text += result.alternatives[0].transcript + ' '
     # keyboard.on_press_key('r', lambda _: audio.recording()) 
     # keyboard.on_press_key('p', lambda _: audio.play()) 
     # keyboard.wait('esc') 
     # print("Saliendo...") 
 
-    # print(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+    tts = TextToSpeech()
+
+    response = tts.synthesize(text)
+
+    audio_response = audio.write(response)
+
+    audio.play(audio_response)
 
 if __name__ == "__main__":
     main()
