@@ -27,6 +27,8 @@ def main():
     # keyboard.wait('esc') 
     # print("Saliendo...") 
 
+    # Aquí iria la integración con algun modelo de LLM
+
     tts = TextToSpeech()
 
     response = tts.synthesize(text)
