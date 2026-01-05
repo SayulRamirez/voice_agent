@@ -1,3 +1,8 @@
 venv/
 .env
-records/**
+.vscode/
+
+records/
+credentials/
+
+__pycache__/
