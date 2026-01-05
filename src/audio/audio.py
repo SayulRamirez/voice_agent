@@ -9,7 +9,6 @@ class Audio:
     SECONDS = 5
 
     def __init__(self):
-        self.records = []
         self.path_request = os.path.join("./records/request/")
         self.path_response = os.path.join("./records/response/")
         os.makedirs(self.path_request, exist_ok=True)
@@ -20,9 +19,7 @@ class Audio:
         audio = sd.rec(int(Audio.SECONDS * Audio.SAMPLING_FRECUENCY), Audio.SAMPLING_FRECUENCY, 1, 'int16')
         sd.wait()
 
-        filename = datetime.strftime(datetime.now(), "%d-%m-%Y_%H-%M-%S")
-
-        self.records.append(filename)
+        filename = self.create_name_file()
 
         file_path = os.path.join(self.path_request, f"{filename}.wav")
 
@@ -31,32 +28,28 @@ class Audio:
         return file_path
 
     def read(self, file_path):
+        print('Leyendo el audio')
         if os.path.exists(file_path):
             with open(file_path, "rb") as audio_file:
                 return audio_file.read()
         return None
-   
-    def play(self):
-        if not self.records:
-            print("No hay audio grabado")
+
+    def write(self, audio):
+        file_path = os.path.join(self.path_response, f"{self.create_name_file()}.wav")
+
+        with open(file_path, "wb") as out:
+            out.write(audio.audio_content)
+            print("Grabación de respuesta guardada")
+        return file_path
+
+    def create_name_file(self):
+        return datetime.strftime(datetime.now(), "%d-%m-%Y_%H-%M-%S")
+    
+    def play(self, path_audio):
+        if not os.path.exists(path_audio):
+            print(f"No se encontro el audio: {path_audio}")
         else:
-            print('Reproduciendo...')
-            rate, audio_search = read(f"{self.path_request}{self.records[-1]}.wav")
-            sd.play(audio_search, rate)
+            rate, audio = read(path_audio)
+            sd.play(audio, rate)
             sd.wait()
-            print('Fin de audio')
-
-    def save_response(self, audio_content: bytes): 
-        """ Guarda la respuesta de la IA (audio binario, por ejemplo de Google TTS) en la carpeta response/ con el mismo timestamp que el último request. """ 
-        if not self.records: 
-            print("No hay request previo para vincular la respuesta") 
-            return 
-        
-        filename = self.records[-1] # mismo timestamp que el último request 
-        filepath = os.path.join(self.path_response, f"{filename}.wav") 
-        
-        with open(filepath, "wb") as f: 
-            f.write(audio_content) 
-            print(f"Respuesta guardada en: {filepath}")
-
-        return filename
+            print('Fin del audio')
